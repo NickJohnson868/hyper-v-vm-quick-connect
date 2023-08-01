@@ -13,7 +13,6 @@ powershell Set-ExecutionPolicy RemoteSigned
 echo.
 
 echo 执行powershell脚本
-echo.
 powershell -File "%~dp0win7.ps1"
 echo.
 
