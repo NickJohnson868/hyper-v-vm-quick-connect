@@ -1,5 +1,5 @@
 # hyper-v-vm-quick-connect
-快速连接本地hyperv虚拟机
+快速连接本地hyperv虚拟机，固定虚拟机IP也行。
 
 1. 本地hyperv中安装win7虚拟机无法全屏。
 2. 无奈使用远程连接win7，使之能全屏。
