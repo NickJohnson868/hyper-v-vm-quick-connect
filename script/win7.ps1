@@ -7,12 +7,14 @@ for ($i = 0; $i -lt $vmNames.Length; $i++)
 {
     Write-Host ("[" + ($i + 1) + "] " + $vmNames[$i])
 }
+Write-Host "[其他] 关闭所有虚拟机"
 
 # 获取用户输入
 $choice = Read-Host "请输入您的选择"
 if ($choice -lt 1 -or $choice -gt $vmNames.Length)
 {
-    Write-Host "无效的选择"
+    Write-Host "正在关闭所有虚拟机..."
+    Get-VM | where {$_.State -eq 'Running'} | Stop-VM
     exit
 }
 
