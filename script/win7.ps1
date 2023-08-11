@@ -32,10 +32,14 @@ if ($vm.State -ne "Running")
     {
         Start-Sleep -Seconds 1
         $vm = Get-VM -VMName $vmName
+        Write-Host "..."
     } while ($vm.State -ne "Running")
+
+    Write-Host "虚拟机已启动完毕"
 }
 
 # 获取虚拟机 IP 地址
+Write-Host "尝试获取虚拟机IP..."
 do
 {
     $ipAddresses = Get-VMNetworkAdapter -VMName $vmName | Select-Object -ExpandProperty IPAddresses
@@ -43,9 +47,10 @@ do
     {
         Start-Sleep -Seconds 1
     }
+    Write-Host "..."
 } while ($ipAddresses.Length -eq 0)
 
-Write-Host "虚拟机已启动完毕"
+Write-Host "正在连接虚拟机..."
 $server = $ipAddresses[0]
 
 $username = "62453"
