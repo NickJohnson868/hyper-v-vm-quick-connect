@@ -19,8 +19,34 @@ if ($choice -lt 1 -or $choice -gt $vmNames.Length)
 # 获取虚拟机名称
 $vmName = $vmNames[$choice - 1]
 
+# 检查虚拟机状态
+$vm = Get-VM -VMName $vmName
+if ($vm.State -ne "Running")
+{
+    # 启动虚拟机
+    Write-Host "正在启动虚拟机..."
+    Start-VM -VMName $vmName
+
+    # 等待虚拟机启动完毕
+    do
+    {
+        Start-Sleep -Seconds 1
+        $vm = Get-VM -VMName $vmName
+    } while ($vm.State -ne "Running")
+}
+
 # 获取虚拟机 IP 地址
-$server = (Get-VMNetworkAdapter -VMName $vmName | Select-Object -ExpandProperty IPAddresses)[0]
+do
+{
+    $ipAddresses = Get-VMNetworkAdapter -VMName $vmName | Select-Object -ExpandProperty IPAddresses
+    if ($ipAddresses.Length -eq 0)
+    {
+        Start-Sleep -Seconds 1
+    }
+} while ($ipAddresses.Length -eq 0)
+
+Write-Host "虚拟机已启动完毕"
+$server = $ipAddresses[0]
 
 $username = "62453"
 $password = "1"
