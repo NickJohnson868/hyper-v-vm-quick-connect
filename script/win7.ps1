@@ -5,9 +5,9 @@ $vmNames = @("Windows 10 x64 LTSC", "Windows 7 x64")
 Write-Host "请选择要连接的虚拟机："
 for ($i = 0; $i -lt $vmNames.Length; $i++)
 {
-    Write-Host ("[" + ($i + 1) + "] " + $vmNames[$i])
+    Write-Host ("[" + ($i + 1) + "]`t" + $vmNames[$i])
 }
-Write-Host "[其他] 关闭所有虚拟机"
+Write-Host "[其他]`t关闭所有虚拟机"
 
 # 获取用户输入
 $choice = Read-Host "请输入您的选择"
@@ -21,6 +21,7 @@ if ($choice -lt 1 -or $choice -gt $vmNames.Length)
 # 获取虚拟机名称
 $vmName = $vmNames[$choice - 1]
 
+Write-Host ""
 # 检查虚拟机状态
 $vm = Get-VM -VMName $vmName
 if ($vm.State -ne "Running")
