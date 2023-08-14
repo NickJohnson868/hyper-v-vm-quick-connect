@@ -7,7 +7,7 @@ function Show-Menu {
     $vmStatuses = Get-VM | Select-Object -ExpandProperty State
     for ($i = 0; $i -lt $vmNames.Length; $i++)
     {
-        Write-Host ("[" + ($i + 1) + "]`t" + $vmNames[$i] + "(" + $vmStatuses[$i] + ")")
+        Write-Host ("[" + ($i + 1) + "]`t" + $vmNames[$i] + " (" + $vmStatuses[$i] + ")")
     }
     Write-Host "[x]`t关闭所有虚拟机"
     Write-Host "[q]`t退出"
