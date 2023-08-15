@@ -8,10 +8,11 @@ function Show-Menu
     $vmStatuses = Get-VM | Select-Object -ExpandProperty State
     for ($i = 0; $i -lt $vmNames.Length; $i++)
     {
-        Write-Host ("[" + ($i + 1) + "]`t" + $vmNames[$i] + " (" + $vmStatuses[$i] + ")")
+        Write-Host ("[ " + ($i + 1) + "  ]`t" + $vmNames[$i] + " (" + $vmStatuses[$i] + ")")
     }
-    Write-Host "[x]`t关闭所有虚拟机"
-    Write-Host "[q]`t退出"
+    Write-Host "[ x  ]`t关闭所有虚拟机"
+    Write-Host "[ q  ]`t退出"
+    Write-Host "[ qx ]`t关闭虚拟机然后退出"
 }
 
 # 定义关闭所有虚拟机的函数
@@ -37,9 +38,10 @@ function Start-VMByName($vmName) {
         {
             Start-Sleep -Seconds 1
             $vm = Get-VM -VMName $vmName
-            Write-Host "..."
+            Write-Host "." -NoNewline
         } while ($vm.State -ne "Running")
 
+        Write-Host "."
         Write-Host "虚拟机已启动完毕"
     }
 }
@@ -50,21 +52,21 @@ function Get-VMIPAddress($vmName)
     # 获取虚拟机 IP 地址
     Write-Host "尝试获取虚拟机IP..."
     $startTime = Get-Date
+
     do
     {
         $ipAddresses = Get-VMNetworkAdapter -VMName $vmName | Select-Object -ExpandProperty IPAddresses
-        if ($ipAddresses.Length -eq 0)
+        if (((Get-Date) - $startTime).TotalSeconds -gt 15)
         {
-            Start-Sleep -Seconds 1
-            if (((Get-Date) - $startTime).TotalSeconds -gt 10)
-            {
-                Write-Host "获取IP超时"
-                return $null
-            }
+            Write-Host "."
+            Write-Host "获取IP超时"
+            return $null
         }
-        Write-Host "..."
+        Write-Host "." -NoNewline
+        Start-Sleep -Seconds 1
     } while ($ipAddresses.Length -eq 0)
 
+    Write-Host "."
     return $ipAddresses[0]
 }
 
@@ -89,7 +91,8 @@ function Run()
         switch ($choice)
         {
             "q" { exit }
-            "x" { Stop-AllVMs; }
+            "x" { Stop-AllVMs }
+            "qx" { Stop-AllVMs; exit }
             default
             {
                 if ($choice -le 0 -or $choice -gt $vmNames.Length)
@@ -109,6 +112,7 @@ function Run()
                     {
                         Write-Host "正在连接虚拟机..."
                         Connect-ToVM $server
+                        Write-Host "`t`t"
                     }
                 }
             }

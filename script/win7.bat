@@ -20,5 +20,3 @@ echo.
 echo 还原策略为 %currentPolicy%
 echo.
 powershell Set-ExecutionPolicy %currentPolicy%
-
-pause
