@@ -2,7 +2,8 @@
 $vmNames = Get-VM | Select-Object -ExpandProperty Name
 
 # 定义显示选择菜单的函数
-function Show-Menu {
+function Show-Menu 
+{
     Write-Host "请选择要连接的虚拟机："
     $vmStatuses = Get-VM | Select-Object -ExpandProperty State
     for ($i = 0; $i -lt $vmNames.Length; $i++)
@@ -14,10 +15,11 @@ function Show-Menu {
 }
 
 # 定义关闭所有虚拟机的函数
-function Stop-AllVMs {
+function Stop-AllVMs 
+{
     Write-Host "正在关闭所有虚拟机..."
-    Get-VM | where {$_.State -eq 'Running'} | Stop-VM
-    Write-Host "关闭完成`n"
+    Get-VM | Where-Object {$_.State -eq 'Running'} | Stop-VM
+    Write-Host "所有虚拟机均已关闭`n"
 }
 
 # 定义启动虚拟机的函数
@@ -43,7 +45,8 @@ function Start-VMByName($vmName) {
 }
 
 # 定义获取虚拟机 IP 地址的函数
-function Get-VMIPAddress($vmName) {
+function Get-VMIPAddress($vmName) 
+{
     # 获取虚拟机 IP 地址
     Write-Host "尝试获取虚拟机IP..."
     $startTime = Get-Date
@@ -66,46 +69,51 @@ function Get-VMIPAddress($vmName) {
 }
 
 # 定义连接到虚拟机的函数
-function Connect-ToVM($server, $username, $password) {
-    cmdkey /generic:TERMSRV/$server /user:"$username" /pass:"$password"
+function Connect-ToVM($server, $uname, $pass) {
     mstsc /v:$server /f
 
-    cmdkey /delete:TERMSRV/$server
+    # cmdkey /generic:TERMSRV/$server /user:"$uname" /pass:"$pass"
+    # mstsc /v:$server /f
+    # cmdkey /delete:TERMSRV/$server
 }
 
-while ($true)
+function Run() 
 {
-    # 显示选择菜单并获取用户输入
-    Show-Menu
-    $choice = Read-Host "请输入您的选择"
-
-    # 处理用户输入
-    if ($choice -eq "q")
+    while ($true)
     {
-        exit
-    }
-    elseif ($choice -eq "x")
-    {
-        Stop-AllVMs
-        continue
-    }
+        # 显示选择菜单并获取用户输入
+        Show-Menu
+        $choice = Read-Host "请输入您的选择"
 
-    if ($choice -lt 0 -or $choice -gt $vmNames.Length)
-    {
-        Write-Host "输入不合法`n"
-        continue
-    }
+        # 处理用户输入
+        switch ($choice)
+        {
+            "q" { exit }
+            "x" { Stop-AllVMs; }
+            default
+            {
+                if ($choice -le 0 -or $choice -gt $vmNames.Length)
+                {
+                    Write-Host "输入不合法`n"
+                } 
+                else
+                {
+                    # 获取虚拟机名称并启动虚拟机
+                    $vmName = $vmNames[$choice - 1]
+                    Start-VMByName $vmName
 
-    # 获取虚拟机名称并启动虚拟机
-    $vmName = $vmNames[$choice - 1]
-    Start-VMByName $vmName
+                    # 获取虚拟机 IP 地址并连接到虚拟机
+                    $server = Get-VMIPAddress $vmName
 
-    # 获取虚拟机 IP 地址并连接到虚拟机
-    $server = Get-VMIPAddress $vmName
-
-    if ($server)
-    {
-        Write-Host "正在连接虚拟机..."
-        Connect-ToVM $server "62453" "1"
+                    if ($server)
+                    {
+                        Write-Host "正在连接虚拟机..."
+                        Connect-ToVM $server
+                    }
+                }
+            }
+        }
     }
 }
+
+Run
