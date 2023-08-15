@@ -11,6 +11,7 @@ function Show-Menu
         Write-Host ("[ " + ($i + 1) + "  ]`t" + $vmNames[$i] + " (" + $vmStatuses[$i] + ")")
     }
     Write-Host "[ x  ]`t关闭所有虚拟机"
+    Write-Host "[ x* ]`t关闭某个虚拟机"
     Write-Host "[ q  ]`t退出"
     Write-Host "[ qx ]`t关闭虚拟机然后退出"
 }
@@ -85,6 +86,7 @@ function Run()
     {
         # 显示选择菜单并获取用户输入
         Show-Menu
+
         $choice = Read-Host "请输入您的选择"
 
         # 处理用户输入
@@ -93,6 +95,23 @@ function Run()
             "q" { exit }
             "x" { Stop-AllVMs }
             "qx" { Stop-AllVMs; exit }
+            { $_ -like "x*" }
+            {
+                $index = $_.Substring(1)
+                if ([int]::TryParse($index, [ref]$null) -and $index -gt 0 -and $index -le $vmNames.Length)
+                {
+                    $vm = Get-VM -Name $vmNames[$index - 1]
+                    if ($vm.State -eq 'Running')
+                    {
+                        Stop-VM -Name $vm.Name
+                    }
+                    Write-Host "该虚拟机已经关闭`n"
+                }
+                else
+                {
+                    Write-Host "输入不合法`n"
+                }
+            }
             default
             {
                 if ($choice -le 0 -or $choice -gt $vmNames.Length)

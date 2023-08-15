@@ -8,7 +8,7 @@ echo.
 echo 当前策略为 %currentPolicy%
 echo.
 
-echo 设置策略为RemoteSigned
+echo 设置策略为 RemoteSigned
 powershell Set-ExecutionPolicy RemoteSigned
 echo.
 
