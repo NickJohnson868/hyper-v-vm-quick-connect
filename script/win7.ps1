@@ -1,5 +1,7 @@
+Set-ExecutionPolicy Restricted
+
 # 定义虚拟机名称数组
-$vmNames = Get-VM | Select-Object -ExpandProperty Name
+$vmNames = @(Get-VM | Select-Object -ExpandProperty Name)
 
 # 定义显示选择菜单的函数
 function Show-Menu 
@@ -25,7 +27,8 @@ function Stop-AllVMs
 }
 
 # 定义启动虚拟机的函数
-function Start-VMByName($vmName) {
+function Start-VMByName($vmName) 
+{
     # 检查虚拟机状态
     $vm = Get-VM -VMName $vmName
     if ($vm.State -ne "Running")
@@ -72,7 +75,8 @@ function Get-VMIPAddress($vmName)
 }
 
 # 定义连接到虚拟机的函数
-function Connect-ToVM($server, $uname, $pass) {
+function Connect-ToVM($server, $uname, $pass) 
+{
     mstsc /v:$server /f
 
     # cmdkey /generic:TERMSRV/$server /user:"$uname" /pass:"$pass"
@@ -80,6 +84,15 @@ function Connect-ToVM($server, $uname, $pass) {
     # cmdkey /delete:TERMSRV/$server
 }
 
+# 定义关闭虚拟机防火墙的函数
+function Disable-VMFirewall($vmName) 
+{
+    Invoke-Command -VMName $vmName -ScriptBlock {
+        netsh advfirewall set allprofiles state off
+    }
+
+    Write-Host "已关闭 $vmName 的防火墙`n"
+}
 function Run() 
 {
     while ($true)
@@ -93,7 +106,7 @@ function Run()
         switch ($choice)
         {
             "q" { exit }
-            "x" { Stop-AllVMs }
+            "x" { Stop-AllVMs; break }
             "qx" { Stop-AllVMs; exit }
             { $_ -like "x*" }
             {
@@ -111,13 +124,28 @@ function Run()
                 {
                     Write-Host "输入不合法`n"
                 }
+                break
             }
+            # {$_ -like "f*"}
+            # {
+            #     $index = $_.Substring(1)
+            #     if ([int]::TryParse($index, [ref]$null) -and $index -gt 0 -and $index -le $vmNames.Length)
+            #     {
+            #         $vmName = $vmNames[$index - 1]
+            #         Disable-VMFirewall $vmName
+            #     }
+            #     else
+            #     {
+            #         Write-Host "输入不合法`n"
+            #     }
+            #     break
+            # }
             default
             {
                 if ($choice -le 0 -or $choice -gt $vmNames.Length)
                 {
                     Write-Host "输入不合法`n"
-                } 
+                }
                 else
                 {
                     # 获取虚拟机名称并启动虚拟机
@@ -134,6 +162,7 @@ function Run()
                         Write-Host "`t`t"
                     }
                 }
+                break
             }
         }
     }

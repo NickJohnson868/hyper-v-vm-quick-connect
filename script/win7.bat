@@ -16,7 +16,3 @@ echo 执行powershell脚本
 echo.
 powershell -File "%~dp0win7.ps1"
 echo.
-
-echo 还原策略为 %currentPolicy%
-echo.
-powershell Set-ExecutionPolicy %currentPolicy%
