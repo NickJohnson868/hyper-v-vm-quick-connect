@@ -1,4 +1,5 @@
 Set-ExecutionPolicy Restricted
+Write-Host "策略设置为 Restricted`n"
 
 # 定义虚拟机名称数组
 $vmNames = @(Get-VM | Select-Object -ExpandProperty Name)
