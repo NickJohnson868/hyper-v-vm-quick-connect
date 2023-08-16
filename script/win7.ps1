@@ -23,7 +23,7 @@ function Stop-AllVMs
 {
     Write-Host "正在关闭所有虚拟机..."
     Get-VM | Where-Object {$_.State -eq 'Running'} | Stop-VM
-    Write-Host "所有虚拟机均已关闭`n"
+    Write-Host "所有虚拟机均已关闭`n" -ForegroundColor Green
 }
 
 # 定义启动虚拟机的函数
@@ -46,7 +46,7 @@ function Start-VMByName($vmName)
         } while ($vm.State -ne "Running")
 
         Write-Host "."
-        Write-Host "虚拟机已启动完毕"
+        Write-Host "虚拟机已启动完毕" -ForegroundColor Green
     }
 }
 
@@ -63,7 +63,7 @@ function Get-VMIPAddress($vmName)
         if (((Get-Date) - $startTime).TotalSeconds -gt 15)
         {
             Write-Host "."
-            Write-Host "获取IP超时"
+            Write-Host "获取IP超时" -ForegroundColor Red
             return $null
         }
         Write-Host "." -NoNewline
@@ -100,7 +100,8 @@ function Run()
         # 显示选择菜单并获取用户输入
         Show-Menu
 
-        $choice = Read-Host "请输入您的选择"
+        Write-Host "请输入您的选择：" -NoNewline -ForegroundColor Blue 
+        $choice = Read-Host
 
         # 处理用户输入
         switch ($choice)
@@ -118,11 +119,11 @@ function Run()
                     {
                         Stop-VM -Name $vm.Name
                     }
-                    Write-Host "该虚拟机已经关闭`n"
+                    Write-Host "该虚拟机已经关闭`n" -ForegroundColor DarkGray
                 }
                 else
                 {
-                    Write-Host "输入不合法`n"
+                    Write-Host "没有对应的虚拟机`n" -ForegroundColor Red
                 }
                 break
             }
@@ -144,7 +145,7 @@ function Run()
             {
                 if ($choice -le 0 -or $choice -gt $vmNames.Length)
                 {
-                    Write-Host "输入不合法`n"
+                    Write-Host "输入的命令不合法`n" -ForegroundColor Red
                 }
                 else
                 {
