@@ -93,6 +93,7 @@ function Disable-VMFirewall($vmName)
 
     Write-Host "已关闭 $vmName 的防火墙`n"
 }
+
 function Run() 
 {
     while ($true)
@@ -112,56 +113,56 @@ function Run()
             { $_ -like "x*" }
             {
                 $index = $_.Substring(1)
-                if ([int]::TryParse($index, [ref]$null) -and $index -gt 0 -and $index -le $vmNames.Length)
+                if ($index -match "^\d+$")
                 {
-                    $vm = Get-VM -Name $vmNames[$index - 1]
-                    if ($vm.State -eq 'Running')
+                    if ([int]$index -gt 0 -and [int]$index -le $vmNames.Length)
                     {
-                        Stop-VM -Name $vm.Name
+                        $vm = Get-VM -Name $vmNames[$index - 1]
+                        if ($vm.State -eq 'Running')
+                        {
+                            Stop-VM -Name $vm.Name
+                        }
+                        Write-Host "该虚拟机已经关闭`n" -ForegroundColor DarkGray
                     }
-                    Write-Host "该虚拟机已经关闭`n" -ForegroundColor DarkGray
+                    else
+                    {
+                        Write-Host "没有对应的虚拟机`n" -ForegroundColor Red
+                    }
                 }
                 else
-                {
-                    Write-Host "没有对应的虚拟机`n" -ForegroundColor Red
-                }
-                break
-            }
-            # {$_ -like "f*"}
-            # {
-            #     $index = $_.Substring(1)
-            #     if ([int]::TryParse($index, [ref]$null) -and $index -gt 0 -and $index -le $vmNames.Length)
-            #     {
-            #         $vmName = $vmNames[$index - 1]
-            #         Disable-VMFirewall $vmName
-            #     }
-            #     else
-            #     {
-            #         Write-Host "输入不合法`n"
-            #     }
-            #     break
-            # }
-            default
-            {
-                if ($choice -le 0 -or $choice -gt $vmNames.Length)
                 {
                     Write-Host "输入的命令不合法`n" -ForegroundColor Red
                 }
+                break
+            }
+            default
+            {
+                if ($choice -match "^\d+$")
+                {
+                    if ([int]$choice -le 0 -or [int]$choice -gt $vmNames.Length)
+                    {
+                        Write-Host "没有对应的虚拟机`n" -ForegroundColor Red
+                    }
+                    else
+                    {
+                        # 获取虚拟机名称并启动虚拟机
+                        $vmName = $vmNames[[int]$choice - 1]
+                        Start-VMByName $vmName
+    
+                        # 获取虚拟机 IP 地址并连接到虚拟机
+                        $server = Get-VMIPAddress $vmName
+    
+                        if ($server)
+                        {
+                            Write-Host "正在连接虚拟机..."
+                            Connect-ToVM $server
+                            Write-Host "`t`t"
+                        }
+                    }
+                }
                 else
                 {
-                    # 获取虚拟机名称并启动虚拟机
-                    $vmName = $vmNames[$choice - 1]
-                    Start-VMByName $vmName
-
-                    # 获取虚拟机 IP 地址并连接到虚拟机
-                    $server = Get-VMIPAddress $vmName
-
-                    if ($server)
-                    {
-                        Write-Host "正在连接虚拟机..."
-                        Connect-ToVM $server
-                        Write-Host "`t`t"
-                    }
+                    Write-Host "输入的命令不合法`n" -ForegroundColor Red
                 }
                 break
             }
