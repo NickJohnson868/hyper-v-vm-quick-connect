@@ -15,8 +15,9 @@ function Show-Menu
     }
     Write-Host "[ x  ]`t关闭所有虚拟机"
     Write-Host "[ x* ]`t关闭某个虚拟机"
-    Write-Host "[ q  ]`t退出"
-    Write-Host "[ qx ]`t关闭虚拟机然后退出"
+    Write-Host "[ r* ]`t重启某个虚拟机"
+    Write-Host "[ q  ]`t退出程序"
+    Write-Host "[ qx ]`t关闭所有虚拟机&退出程序"
 }
 
 # 定义关闭所有虚拟机的函数
@@ -123,7 +124,38 @@ function Run()
                         {
                             Stop-VM -Name $vm.Name
                         }
-                        Write-Host "该虚拟机已经关闭`n" -ForegroundColor DarkGray
+                        else
+                        {
+                            Write-Host "该虚拟机已经关闭`n" -ForegroundColor DarkGray
+                        }
+                    }
+                    else
+                    {
+                        Write-Host "没有对应的虚拟机`n" -ForegroundColor Red
+                    }
+                }
+                else
+                {
+                    Write-Host "输入的命令不合法`n" -ForegroundColor Red
+                }
+                break
+            }
+            { $_ -like "r*" }
+            {
+                $index = $_.Substring(1)
+                if ($index -match "^\d+$")
+                {
+                    if ([int]$index -gt 0 -and [int]$index -le $vmNames.Length)
+                    {
+                        $vm = Get-VM -Name $vmNames[$index - 1]
+                        if ($vm.State -eq 'Running')
+                        {
+                            Restart-VM -Name $vm.Name
+                        }
+                        else
+                        {
+                            Write-Host "该虚拟机未启动`n" -ForegroundColor DarkGray
+                        }
                     }
                     else
                     {
