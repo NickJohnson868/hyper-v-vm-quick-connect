@@ -34,6 +34,7 @@ function Show-Menu {
     $vmItems += "[ x* ]`t关闭某个虚拟机"
     $vmItems += "[ r* ]`t重启某个虚拟机"
     $vmItems += "[ q  ]`t退出程序"
+    $vmItems += "[ c  ]`t清空屏幕"
     $vmItems += "[ qx ]`t关闭所有虚拟机&退出程序"
     $vmItems | ForEach-Object { Write-Host $_ }
 }
@@ -88,6 +89,9 @@ function Run {
         switch ($choice) {
             "q" {
                 exit
+            }
+            "c" {
+                clear
             }
             { $_ -in "x", "qx" } {
                 Stop-AllVMs
