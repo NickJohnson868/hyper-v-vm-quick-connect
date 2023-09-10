@@ -1,6 +1,8 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <string>
+#include <cstring>
 
 using namespace std;
 
@@ -17,14 +19,14 @@ using namespace std;
 
 vector<pair<int, double>> v1, v2;
 map<int, int> m;
-const int x = 15000;
+const int _start = 5000, _end = 5000;
 
 int main()
 {
-	bool out = false, echars = false;
+	bool out = false, echars = true;
 
 	int cnt1 = 0, cnt2 = 0, cnt3 = 0;
-	for (int n = 0; n <= x; n++)
+	for (int n = _start; n <= _end; n++)
 	{
 		double res1 = 0, res2 = 0;
 
@@ -57,7 +59,7 @@ int main()
 
 		per_sec = 1.5, y = 0;
 		// i是攻击的次数
-		for (int i = 0; i <= 100; i++)
+		for (int i = 0; i <= 10000; i++)
 		{
 			double seconds = i * per_sec;
 			y += 200 + n * 0.13;
@@ -102,27 +104,53 @@ int main()
 	if (echars)
 	{
 		cout << endl;
-		cout << '[';
-		for (int n = 0; n <= x; n++)
-		{
-			if (n != x)
-				cout << n << ",";
-			else
-				cout << n;
-		}
-		cout << "]";
 
-		cout << endl;
-		cout << '[';
-		for (int n = 0; n <= x; n++)
+		string str = "option = { \n \
+			xAxis: { \n \
+				type: 'category', \n \
+				data : %s \n \
+			}, \n \
+			yAxis: { \n \
+				type: 'value' \n \
+			}, \n \
+			series: [ \n \
+				{ \n \
+					data: %s, \n \
+					type : 'line', \n \
+					smooth : true \n \
+				} \n \
+			]\n \
+		};";
+		string data1 = "[", data2 = "[";
+		for (int n = _start; n <= _end; n++)
 		{
-			if (n != x)
-				cout << m[n] << ",";
+			if (n != _end)
+				data1.append(std::to_string(n)).append(",");
 			else
-				cout << m[n];
+				data1.append(std::to_string(n));
 		}
-		cout << "]";
+		data1.append("]");
+
+		for (int n = _start; n <= _end; n++)
+		{
+			if (n != _end)
+				data2.append(std::to_string(m[n])).append(",");
+			else
+				data2.append(std::to_string(m[n]));
+		}
+		data2.append("]");
+
+		size_t pos = str.find("%s");
+		if (pos != std::string::npos)
+			str.replace(pos, 2, data1);  // 替换第一个%s为data1
+
+		pos = str.find("%s");
+		if (pos != std::string::npos)
+			str.replace(pos, 2, data2);  // 替换第二个%s为data2
+
+		cout << str << endl;
 	}
 
+	system("pause");
 	return 0;
 }
