@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <map>
 #include <vector>
 #include <string>
@@ -19,7 +19,7 @@ using namespace std;
 
 vector<pair<int, double>> v1, v2;
 map<int, int> m;
-const int _start = 5000, _end = 5000;
+const int _start = 0, _end = 20000;
 
 int main()
 {
